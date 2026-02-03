@@ -23,6 +23,7 @@ logging:
     org.springframework.security: trace
     com.ch.memberservice.member.security: debug
     com.ch.memberservice.member.controller: debug
+    com.ch.memberservice.member.jwt.: debug
 
 app:
   frontend-url: "http://localhost:5173"

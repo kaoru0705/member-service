@@ -13,12 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.naming.AuthenticationException;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -72,6 +70,17 @@ public class AuthController {
         String accessToken = jwtTokenProvider.createAccessToken(auth);
 
         return ResponseEntity.ok(new LoginResponse(accessToken));
+    }
+    /*-----------------------------------------------------------------------------------------
+    로그인해야 서비스 받을 수 있는 보호된 API
+    ------------------------------------------------------------------------------------------*/
+    @GetMapping("/me")
+    public Map<String, Object> getMyInfo(Authentication auth) {
+
+        // Authentication 들어있는 Principal을 꺼내서 사용정보로 제공
+        MemberUserDetails memberUserDetails = (MemberUserDetails)auth.getPrincipal();
+
+        return Map.of("name", memberUserDetails.getUsername());
     }
 
     @ExceptionHandler(AuthenticationException.class)

@@ -1,8 +1,10 @@
 package com.ch.memberservice.member.controller;
 
+import com.ch.memberservice.member.dto.LoginResponse;
 import com.ch.memberservice.member.dto.MemberRequest;
 import com.ch.memberservice.member.dto.MemberResponse;
 import com.ch.memberservice.member.entity.MemberUserDetails;
+import com.ch.memberservice.member.jwt.JwtTokenProvider;
 import com.ch.memberservice.member.repository.MemberRepository;
 import com.ch.memberservice.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class AuthController {
 
     private final MemberService memberService;
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 회원 임시 등록 (비번을 암호화하여 임시로 등록해보기)
     // 우회해서 등록하려면 Filter를 거치지만 예외로 허용시켜서(requestMatchers) 바로 AuthController로 가게 만들고
@@ -59,8 +62,16 @@ public class AuthController {
         // MemberUserDetails에는 password도 들어있으므로
         MemberUserDetails userDetails = (MemberUserDetails)auth.getPrincipal();
 
-        // 로그인 성공하자마이니 많은 정보를 주지 않겠다. 마이페이지도 아니니까 null userDetails.getName()
-        return ResponseEntity.ok(new MemberResponse(userDetails.getUsername(), null));
+        if(auth == null) {
+            log.debug("로그인 인증 실패");
+        }
+
+        log.debug("로그인 인증 성공");
+
+        // AccessToken 발급
+        String accessToken = jwtTokenProvider.createAccessToken(auth);
+
+        return ResponseEntity.ok(new LoginResponse(accessToken));
     }
 
     @ExceptionHandler(AuthenticationException.class)

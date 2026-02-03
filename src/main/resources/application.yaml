@@ -21,6 +21,8 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.security: trace
+    com.ch.memberservice.member.security: debug
+    com.ch.memberservice.member.controller: debug
 
 app:
   frontend-url: "http://localhost:5173"

@@ -24,7 +24,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, LoginSuccessHandler loginSuccessHandler) throws Exception {
 
         httpSecurity.csrf(csrf -> csrf.disable());
         httpSecurity.authorizeHttpRequests(auth -> auth
@@ -41,6 +41,8 @@ public class SecurityConfig {
         httpSecurity.formLogin(form -> form
                 .usernameParameter("homepageId")
                 .passwordParameter("password")
+                // component로 등록된 LoginSuccessHandler는 Bean에 등록해서 사용할 필요가 없다. ComponentScan
+                .successHandler(loginSuccessHandler)
         );
 
         return httpSecurity.build();

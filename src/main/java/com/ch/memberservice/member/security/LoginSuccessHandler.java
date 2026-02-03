@@ -22,5 +22,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler{
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         MemberUserDetails memberUserDetails = (MemberUserDetails)authentication.getPrincipal();
         log.debug("성공 후 유저명 알아 맞추기 {}", memberUserDetails.getUsername());
+
+        response.getWriter().write(memberUserDetails.getUsername() + "님 로그인 성공");
     }
 }

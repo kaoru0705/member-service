@@ -69,16 +69,20 @@ public class AuthController {
         // AccessToken 발급
         String accessToken = jwtTokenProvider.createAccessToken(auth);
 
+        // LoginResponse 쓰는 이유? 이래야 ResponseBody로 accessToken 객체 형태로 보내서 json으로 바꿀 수 있다.
         return ResponseEntity.ok(new LoginResponse(accessToken));
     }
     /*-----------------------------------------------------------------------------------------
     로그인해야 서비스 받을 수 있는 보호된 API
+
+    SecurityContextHolder.getContext().setAuthentication(auth); in JwtAuthFilter 여기서 저장된 게 Authentication auth에 주입된다.
     ------------------------------------------------------------------------------------------*/
     @GetMapping("/me")
     public Map<String, Object> getMyInfo(Authentication auth) {
 
         // Authentication 들어있는 Principal을 꺼내서 사용정보로 제공
         MemberUserDetails memberUserDetails = (MemberUserDetails)auth.getPrincipal();
+        //log.debug("auth.getPassword in getMyInfo {}", memberUserDetails.getPassword());
 
         return Map.of("name", memberUserDetails.getUsername());
     }

@@ -137,7 +137,7 @@ public class AuthController {
         });
 
         /*--------------------------------------------------------
-        2) 블랙리스트 등록(지금 쓰고 있는 Access Token을 즉시 무효라 만들어서, 아직 만료되지 않았어도 다시는 못 쓰게 함)
+        2) 블랙리스트 등록(지금 쓰고 있는 Access Token을 즉시 무효로 만들어서, 아직 만료되지 않았어도 다시는 못 쓰게 함)
         --------------------------------------------------------*/
         AccessTokenExtractor.extractBearerToken(request).ifPresent(acc -> {
 

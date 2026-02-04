@@ -58,6 +58,7 @@ public class RefreshCookieSupport {
                 .maxAge(Duration.ZERO)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        log.debug("RefreshToken 쿠키 삭제");
     }
 
     /*-------------------------------------------------------------------------------------------

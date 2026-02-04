@@ -1,5 +1,6 @@
 package com.ch.memberservice.member.jwt;
 
+import com.ch.memberservice.member.entity.MemberUserDetails;
 import com.ch.memberservice.member.service.MemberDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -55,9 +56,14 @@ public class JwtTokenProvider {
         Instant now = Instant.now();    // 현재 시간 구하기
         Instant exp = now.plusSeconds(accessExpSeconds);    // 만료 시간
 
+        // Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(memberRequest.getHomepageId(), memberRequest.getPassword())); in AuthController
+        // auth에서 principal에는 MemberUserDetails가 들어있을 것이다. 그리고 그안에 ((MemberUserDetails)auth.getPrincipal()).getAuthorities() 에는 권한이 있을 것이다.
+        // 허나 AuthenticationManager가 인증을 완료하는 순간 MemberUserDetails에 "ROLE_USER"가 Authenticaiton.getAuthorities()에 list로 들어간다.
+        // 따라서 캐스팅해서 호출할 필요가 없다.
+
         // 권한 중 역할을 하나로 뭉침
         String roles = auth.getAuthorities().stream()
-                // (auth) -> auth.getAuthority()
+                // .map(auth -> auth.getAuthority())
                 .map(GrantedAuthority::getAuthority)
                 //Collectors.joining(",")은 요소가 2개 이상일 때 "ROLE_USER,ROLE_ADMIN" MemberUserDetails에서 getAuthorities가 아직 ROLE_USER 고정이라 와닿진 않는다.
                 .collect(Collectors.joining(","));

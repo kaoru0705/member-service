@@ -73,7 +73,6 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        // 기본 폼로그인은 username, password를 사용한다. 우리는 homepageId, password를 사용하니 바꿔야 한다.
         // 폼로그인에 대한 설정
         httpSecurity.formLogin(form -> form.disable());
         httpSecurity.httpBasic(basic -> basic.disable());

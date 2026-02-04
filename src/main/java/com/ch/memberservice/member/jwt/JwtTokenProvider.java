@@ -20,6 +20,7 @@ import java.security.KeyStore;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,6 +32,10 @@ public class JwtTokenProvider {
 
     @Value("${app.jwt.access-exp-seconds}")
     private long accessExpSeconds;
+
+    @Value("${app.jwt.refresh-exp-seconds}")
+    private long refreshExpSeconds;
+
 
     private SecretKey key;
 
@@ -63,6 +68,26 @@ public class JwtTokenProvider {
                 .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
+    /*-------------------------------------------------------------------------------------------
+     RefreshToken 토큰 (AccessToken이 만료시간이 짧으므로, 이를 갱신하기 위한 토큰)
+     ------------------------------------------------------------------------------------------*/
+    public String createRefreshToken(Long memberId) {
+        Instant now = Instant.now();    // 현재 시간 구하기
+        Instant exp = now.plusSeconds(refreshExpSeconds);    // 만료 시간
+
+        // Universally Unique IDentifier -32자리  전세계적으로 겹칠 확률이 거의 없음
+        String jti = UUID.randomUUID().toString();
+
+
+        return Jwts.builder()
+                .id(jti)// 고유값(중복될 가능성이 거의 없는 수준의 고유값)
+                .subject(Long.toString(memberId))    // 우리의 경우 OAuth2로 로그인한 유저는 homepageId가 null일 수 있기 때문...
+                .issuedAt(Date.from(now))   // 토큰 발급 시간
+                .expiration(Date.from(exp))
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
+    }
+
     /*-------------------------------------------------------------------------------------------
      AccessToken 유효성 검증
      ------------------------------------------------------------------------------------------*/

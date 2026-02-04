@@ -3,6 +3,7 @@ package com.ch.memberservice.member.controller;
 import com.ch.memberservice.member.dto.LoginResponse;
 import com.ch.memberservice.member.dto.MemberRequest;
 import com.ch.memberservice.member.dto.MemberResponse;
+import com.ch.memberservice.member.entity.Member;
 import com.ch.memberservice.member.entity.MemberUserDetails;
 import com.ch.memberservice.member.jwt.JwtTokenProvider;
 import com.ch.memberservice.member.repository.MemberRepository;
@@ -59,6 +60,7 @@ public class AuthController {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(memberRequest.getHomepageId(), memberRequest.getPassword()));
         // MemberUserDetails에는 password도 들어있으므로
         MemberUserDetails userDetails = (MemberUserDetails)auth.getPrincipal();
+        Member member = userDetails.getMember();
 
         if(auth == null) {
             log.debug("로그인 인증 실패");
@@ -68,6 +70,7 @@ public class AuthController {
 
         // AccessToken 발급
         String accessToken = jwtTokenProvider.createAccessToken(auth);
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
 
         // LoginResponse 쓰는 이유? 이래야 ResponseBody로 accessToken 객체 형태로 보내서 json으로 바꿀 수 있다.
         return ResponseEntity.ok(new LoginResponse(accessToken));

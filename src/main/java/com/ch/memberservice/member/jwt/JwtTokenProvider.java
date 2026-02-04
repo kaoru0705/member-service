@@ -50,8 +50,11 @@ public class JwtTokenProvider {
         Instant now = Instant.now();    // 현재 시간 구하기
         Instant exp = now.plusSeconds(accessExpSeconds);    // 만료 시간
 
+        // 권한 중 역할을 하나로 뭉침
         String roles = auth.getAuthorities().stream()
+                // (auth) -> auth.getAuthority()
                 .map(GrantedAuthority::getAuthority)
+                //Collectors.joining(",")은 요소가 2개 이상일 때 "ROLE_USER,ROLE_ADMIN" MemberUserDetails에서 getAuthorities가 아직 ROLE_USER 고정이라 와닿진 않는다.
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()

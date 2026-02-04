@@ -95,8 +95,8 @@ public class RedisTokenStore {
     DEL rt:current:{memberId}
      ------------------------------------------------------------*/
     public void revokeRefreshToken(Long memberId, String jti) {
-        redisTemplate.delete("rt" + memberId + ":" + jti);  // refresh token 삭제
-        redisTemplate.delete("rt:current" + memberId);      // refresh token 상태값 삭제
+        redisTemplate.delete("rt:" + memberId + ":" + jti);  // refresh token 삭제
+        redisTemplate.delete("rt:current:" + memberId);      // refresh token 상태값 삭제
     }
 
     /*------------------------------------------------------------
@@ -108,6 +108,7 @@ public class RedisTokenStore {
         if(jti != null) {
             revokeRefreshToken(memberId, jti);
         } else {
+            // current가 없어도 혹시 남아 있을 수 있으니 current만 삭제 시도
             redisTemplate.delete("rt:current:" + memberId);
         }
     }

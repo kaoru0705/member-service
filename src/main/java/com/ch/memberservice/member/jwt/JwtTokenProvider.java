@@ -88,6 +88,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .id(jti)// 고유값(중복될 가능성이 거의 없는 수준의 고유값)
                 .subject(Long.toString(memberId))    // 우리의 경우 OAuth2로 로그인한 유저는 homepageId가 null일 수 있기 때문...
+                .claim("tokenType", "refresh")
                 .issuedAt(Date.from(now))   // 토큰 발급 시간
                 .expiration(Date.from(exp))
                 .signWith(key, Jwts.SIG.HS256)
@@ -137,6 +138,18 @@ public class JwtTokenProvider {
             return false;
         }
 
+    }
+
+    /*----------------------------------------------------------
+     Refresh 토큰 유효성 검증
+     ----------------------------------------------------------*/
+    public boolean validateRefreshToken(String token) {
+        try {
+            Claims claims = getClaims(token);
+            return "refresh".equals(claims.get("tokenType", String.class));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /*-------------------------------------------------------------------------------------------

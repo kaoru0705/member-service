@@ -36,8 +36,8 @@ app:
   jwt:
     # powershell에 [Convert]::ToBase64String((1..64 | ForEach-Object {Get-Random -Maximum 256}))
     secret: "g+3LCwjtNetshzbjx/Z6Ts5jyjwvlcbZzaN3Za9c/Ejd1EVS51jMk7vCfdQ7teU9MKOGYk+IyTn24IweHXAjpw=="
-    access-exp-seconds: 900 # 15분 accesToken 15분
-    refresh-exp-seconds: 1209600  # 14일
+    access-exp-seconds: 900 #15분
+    refresh-exp-seconds: 1209600 #14일
     refresh-cookie-path: "/api/auth"
     refresh-cookie-secure: false
-    refresh-cookie-sameSite: "Lax"
+    refresh-cookie-samesite: "Lax"

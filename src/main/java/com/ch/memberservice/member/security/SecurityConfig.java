@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         // 허용할 URI 패턴 우리의 경우 /api/**
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**",  config);
+        source.registerCorsConfiguration("/**",  config);
 
         return source;
     }

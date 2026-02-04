@@ -114,7 +114,6 @@ public class AuthController {
         /*--------------------------------------------------------
         1) refresh 토큰이 존재하면 폐기
         --------------------------------------------------------*/
-
         /*
             반환값이 Optional 일 경우 이 객체의 메서드 중 ifPresent()가 지원됨
             ifPresent()는 객체가 존재할 때만 동작, 존재하지 않으면 호출되지 않음...
@@ -123,11 +122,9 @@ public class AuthController {
             readCookie 메서드는 그 수많은 헤더 중 Cookie라는 이름의 헤더를 찾아 그 안에서 refreshToken이라는 글자를 찾아내는 것입니다.
          */
         refreshCookieSupport.readCookie(request, "refreshToken").ifPresent(rt -> {
-
             try {
-                if (jwtTokenProvider.validateAccessToken(rt)) {  // 토큰이 유효하다면...
+                if (jwtTokenProvider.validateRefreshToken(rt)) {  // 토큰이 유효하다면...
                     // redis에서 삭제
-
                     Long memberId = Long.parseLong(jwtTokenProvider.getSubject(rt));
                     String jti = jwtTokenProvider.getJti(rt);
                     redisTokenStore.revokeRefreshToken(memberId, jti);  // refresh token 제거

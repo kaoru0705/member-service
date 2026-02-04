@@ -48,7 +48,7 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));     // header는 * 패턴 가능 혹시 보안을 더 강화할 일이 있다면, 헤더를 지정하는 게 좋다.
         // 로그인 성공 시 세션 쿠키에서 웹브라우저가 요청을 할 때 톰캣이 session Id를 줘야 함 true로 설정
-        config.setAllowCredentials(false);   // 만일 true로 주지 않으면, 브라우저가 쿠키를 보내지 않거나 응답을 막음
+        config.setAllowCredentials(true);   // 만일 true로 주지 않으면, 브라우저가 쿠키를 보내지 않거나 응답을 막음
         config.setMaxAge(3600L);    // 3600 초 동안 동일 조건이라면 preflight를 매번 하지 않음
 
         // 허용할 URI 패턴 우리의 경우 /api/**
@@ -62,6 +62,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, LoginSuccessHandler loginSuccessHandler) throws Exception {
 
         httpSecurity.csrf(csrf -> csrf.disable());
+        httpSecurity.cors(cors -> {});
+
         httpSecurity.authorizeHttpRequests(auth -> auth
                 // 어떤 preflight가 되든 다 허용
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -73,12 +75,8 @@ public class SecurityConfig {
 
         // 기본 폼로그인은 username, password를 사용한다. 우리는 homepageId, password를 사용하니 바꿔야 한다.
         // 폼로그인에 대한 설정
-        httpSecurity.formLogin(form -> form
-                .usernameParameter("homepageId")
-                .passwordParameter("password")
-                // component로 등록된 LoginSuccessHandler는 Bean에 등록해서 사용할 필요가 없다. ComponentScan
-                .successHandler(loginSuccessHandler)
-        );
+        httpSecurity.formLogin(form -> form.disable());
+        httpSecurity.httpBasic(basic -> basic.disable());
 
         // JWT를 사용하기 때문에 더 이상, 세션을 만들지 않겠다.
         httpSecurity.sessionManagement(session -> session

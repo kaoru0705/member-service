@@ -59,7 +59,10 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        String jti = UUID.randomUUID().toString();
+
         return Jwts.builder()
+                .id(jti)
                 .subject(auth.getName())    // homepageId
                 .claim("roles", roles)    // 주장 아니라 여기선 사실
                 .claim("tokenType", "access")   // api 서버 접근용 토큰 (최대 생존 기간 15분으로 설정함)
@@ -90,7 +93,9 @@ public class JwtTokenProvider {
 
     /*-------------------------------------------------------------------------------------------
      AccessToken 유효성 검증
+     getClaims()를 하는 중 위조된 경우 Exception 발생
      ------------------------------------------------------------------------------------------*/
+
     public Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -98,6 +103,22 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    // subject 반환 == memberId or homepageId
+    public String getSubject(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    // JTI 반환
+    public String getJti(String token) {
+        return getClaims(token).getId();
+    }
+
+    // Exp 반환
+    public Instant getExp(String token) {
+        return getClaims(token).getExpiration().toInstant();
+    }
+
 
     // 위변조 검증을 원하는 토큰을 매개변수로 넘김
     // 합쳐진 토큰을 getClaims를 통해 분해해서 반환
@@ -117,6 +138,7 @@ public class JwtTokenProvider {
 
     /*-------------------------------------------------------------------------------------------
      토큰을 이용하여 Authentication Token 얻기
+     당연한 얘기지만 이미 과거에 로그인 한 사람이니 토큰으로 정보를 가져올 수 있는 것이다.
      ------------------------------------------------------------------------------------------*/
     public Authentication getAuthentication(String token) {
         // 토큰의 주인 즉, 회원의 id 꺼내기

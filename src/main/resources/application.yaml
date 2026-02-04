@@ -8,6 +8,11 @@ spring:
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 5555
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -33,3 +38,6 @@ app:
     secret: "g+3LCwjtNetshzbjx/Z6Ts5jyjwvlcbZzaN3Za9c/Ejd1EVS51jMk7vCfdQ7teU9MKOGYk+IyTn24IweHXAjpw=="
     access-exp-seconds: 900 # 15분 accesToken 15분
     refresh-exp-seconds: 1209600  # 14일
+    refresh-cookie-path: "/api/auth"
+    refresh-cookie-secure: false
+    refresh-cookie-sameSite: "Lax"

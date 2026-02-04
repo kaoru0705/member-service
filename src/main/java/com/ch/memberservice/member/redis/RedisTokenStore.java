@@ -26,10 +26,11 @@ public class RedisTokenStore {
     rt:current(현재 사용중인지 아닌지를 나타내는 키워드):{memberId} {jit} ex) rt:current:23 jti(UUID)
     로그인하면 멤버아이디를 통해 current key  값을 알 수 있고 그 value가 존재하지 않는다면 위에 rt:{memberId}:{jti} 이걸 제거
 
+    refrehstoken 원문을 클라이언트에게 쿠키로 주지만 HttpOnly 옵션을 주니 JS에서 조작할 수 없다.
      ------------------------------------------------------------*/
 
-    private final StringRedisTemplate stringRedisTemplate;  // CRUD 전담 객체
-    private final RedisTemplate<Object, String> redisTemplate;
+    private final StringRedisTemplate redisTemplate;  // CRUD 전담 객체
+
 
     /*------------------------------------------------------------
     Refresh Token 저장
@@ -69,6 +70,7 @@ public class RedisTokenStore {
 
     /*------------------------------------------------------------
     유효한 토큰 존재 여부 판단
+    이 메서드는 사용자가 Refresh Token을 지참하여 서버로 전송했을 때 호출될 메서드..
     내가 이미 알고 있던 파라미터들과 비교
      ------------------------------------------------------------*/
     public boolean matchesRefreshToken(Long memberId, String jti, String refreshToken) {
@@ -86,6 +88,48 @@ public class RedisTokenStore {
         return savedHash.equals(sha256(refreshToken));
     }
 
+    /*------------------------------------------------------------
+    Refresh Token 폐기(회전 = rotation = 재발급, 로그아웃)
+    grant <-> revoke
+    DEL rt:{memberId}:{jti}
+    DEL rt:current:{memberId}
+     ------------------------------------------------------------*/
+    public void revokeRefreshToken(Long memberId, String jti) {
+        redisTemplate.delete("rt" + memberId + ":" + jti);  // refresh token 삭제
+        redisTemplate.delete("rt:current" + memberId);      // refresh token 상태값 삭제
+    }
 
+    /*------------------------------------------------------------
+    전부 폐기(강제 로그아웃)
+     ------------------------------------------------------------*/
+    public void revokeAllByUser(Long memberId) {
+        String jti = getCurrentRefreshJti(memberId);
 
+        if(jti != null) {
+            revokeRefreshToken(memberId, jti);
+        } else {
+            redisTemplate.delete("rt:current:" + memberId);
+        }
+    }
+
+    /*------------------------------------------------------------
+    블랙리스트 등록
+    로그아웃을 안 한 상태에서 해커가 액세스 토큰을 털었다면?
+    서버가 이상한 움직임을 감지하고 토큰을 발급은 했으나 사용하지 못하게 만들어야 한다. (삭제 이외에 방법)
+    SET bl:at:{accessJti} 1 EX 200
+     ------------------------------------------------------------*/
+    public void blackListAccessToken(String accessJti, long ttl) {
+        if(ttl <= 0) return;
+        redisTemplate.opsForValue().set("bl:at:" + accessJti, "1", Duration.ofSeconds(ttl));
+    }
+
+    /*------------------------------------------------------------
+    블랙리스트 확인
+    SETY bl:at{jti} 1 EX 60
+     ------------------------------------------------------------*/
+    public boolean isAccessTokenBlacklisted(String accessJti) {
+        Boolean exists = redisTemplate.hasKey("bl:at:" + accessJti);
+
+        return (exists != null) && exists;
+    }
 }

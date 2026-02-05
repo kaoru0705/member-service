@@ -1,0 +1,30 @@
+create table provider(
+    provider_id int primary key auto_increment
+    , provider_name varchar(20)
+);
+
+insert into provider(provider_name) values('google');
+insert into provider(provider_name) values('naver');
+insert into provider(provider_name) values('kakao');
+insert into provider(provider_name) values('homepage');
+
+drop table member;
+
+create table member(
+    member_id bigint primary key auto_increment
+    , homepage_id varchar(20)
+    , password varchar(64)
+    , open_id varchar(255)
+    , name varchar(40)
+    , email varchar(30)
+    , phone varchar(13)
+    , regdate DATETIME default CURRENT_TIMESTAMP
+    , updated datetime default current_timestamp on update current_timestamp
+    , provider_id int
+    , constraint fk_provider_member foreign key (provider_id) references provider(provider_id)
+);
+
+
+1) boot oauth2 client 설치
+2) ProviderRepository, Provider Entity
+3) OAuth2UserInfo 3종 + Factory

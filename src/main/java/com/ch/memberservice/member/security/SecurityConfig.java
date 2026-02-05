@@ -1,6 +1,8 @@
 package com.ch.memberservice.member.security;
 
 import com.ch.memberservice.member.jwt.JwtAuthFilter;
+import com.ch.memberservice.member.oauth2.CustomOAuth2UserService;
+import com.ch.memberservice.member.oauth2.OAuth2JwtSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +29,10 @@ public class SecurityConfig {
     private String frontendUrl;
 
     private final JwtAuthFilter jwtAuthFilter;
+
+    // OAuth2 관련 빈 등록
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2JwtSuccessHandler oAuth2JwtSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -69,6 +75,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/login/oauth2/**").permitAll()    // oauth 관련...
+                .requestMatchers("/oauth2/**").permitAll()    // snsLogin() in frontend
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
         );
@@ -80,6 +88,14 @@ public class SecurityConfig {
         // JWT를 사용하기 때문에 더 이상, 세션을 만들지 않겠다.
         httpSecurity.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        // OAuth2 로그인 설정 추가
+        httpSecurity.oauth2Login(oauth2 -> oauth2
+                // 사용자 정보를 처리할 서비스 객체 등록
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                // 로그인 성공 처리
+                .successHandler(oAuth2JwtSuccessHandler)
         );
 
         // JWT 필터 등록

@@ -21,7 +21,7 @@ public class MemberService {
         String password = memberRequest.getPassword();
         String name = memberRequest.getName();
 
-        Member member = new Member(homepageId, passwordEncoder.encode(password), name);
+        Member member = Member.create(homepageId, passwordEncoder.encode(password), name, null);
 
         return memberRepository.save(member);
     }

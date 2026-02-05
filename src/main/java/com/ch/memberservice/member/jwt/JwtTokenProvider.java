@@ -72,7 +72,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .id(jti)
-                .subject(auth.getName())    // homepageId
+                .subject(auth.getName())    // memberId
                 .claim("roles", roles)    // 주장 아니라 여기선 사실
                 .claim("tokenType", "access")   // api 서버 접근용 토큰 (최대 생존 기간 15분으로 설정함)
                 .issuedAt(Date.from(now))   // 토큰 발급 시간

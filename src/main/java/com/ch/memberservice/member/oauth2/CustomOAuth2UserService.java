@@ -39,21 +39,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         // 회원가입을 위한 provider 정보 추출 yaml
-        String registartionId = userRequest.getClientRegistration().getRegistrationId();    // google, naver, kakao
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();    // google, naver, kakao
 
         // 구글은 지원 객체가 다르므로, 여기서 google일 경우 코드 진행을 막자
-        if("google".equals(registartionId)) {
+        if("google".equals(registrationId)) {
             return super.loadUser(userRequest);
         }
 
-        OAuth2UserInfo info = OAuth2UserInfoFactory.from(registartionId, oAuth2User.getAttributes());
+        OAuth2UserInfo info = OAuth2UserInfoFactory.from(registrationId, oAuth2User.getAttributes());
 
         // registrationId는 String일 뿐이므로, Provider entity 직접 만들어야 함
-        Provider provider = providerRepository.findByProviderName(registartionId).orElseThrow(() -> new OAuth2AuthenticationException("provider not found in db"));
+        Provider provider = providerRepository.findByProviderName(registrationId).orElseThrow(() -> new OAuth2AuthenticationException("provider not found in db"));
 
         // 회원가입(우리 db에 회원이 없을 때만..)
         // orElseGet이란? 값이 있으면 그대로 쓰고, 없을 때만 람다를 실행하여 그 결과를 대신해
-        Member member = memberRepository.findByProvider_ProviderNameAndOpenId(registartionId, info.openId())
+        Member member = memberRepository.findByProvider_ProviderNameAndOpenId(registrationId, info.openId())
                 .orElseGet(() -> {
                     return memberRepository.save(
                             Member.createOAuth2(
@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 각 sns의 회원정보 맵
         Map<String, Object> attrs = new HashMap<>(oAuth2User.getAttributes());  // sub, response_id, id
         attrs.put("openId", info.openId()); // 개발자가 정의한 key-value 추가
-        attrs.put("provider", registartionId);  // 개발자가 정의한 key-value 추가
+        attrs.put("provider", registrationId);  // 개발자가 정의한 key-value 추가
 
         // 아래에서 반환되는 DefaultOAuth2User는 로그인 성공 시 Security가 Authentication Token(OAuth2Authentication Token) 안의 principal로 들어감...
         return new DefaultOAuth2User(authorities, attrs, "openId");

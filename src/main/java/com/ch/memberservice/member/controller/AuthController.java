@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -175,6 +176,20 @@ public class AuthController {
         //log.debug("auth.getPassword in getMyInfo {}", memberUserDetails.getPassword());
 
         return Map.of("name", memberUserDetails.getUsername());
+    }
+
+    /*-----------------------------------------------------------------------------------------
+    리액트 프론트에서 코드가 전송되면, 이 코드를 이용하여 redis에서 AccessToken을 찾아 반환
+    ------------------------------------------------------------------------------------------*/
+    @PostMapping("/oauth2/exchange")
+    public ResponseEntity<?> exchange(@RequestParam String code) {
+
+        String accessToken = redisTokenStore.consumeCode(code).orElseThrow(() -> new IllegalArgumentException("Invalid code"));
+
+        return ResponseEntity.ok(Map.of(
+                "tokenType", "Bearer ",
+                "accessToken", accessToken
+        ));
     }
 
     @ExceptionHandler(AuthenticationException.class)

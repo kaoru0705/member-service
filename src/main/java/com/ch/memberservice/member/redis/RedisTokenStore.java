@@ -5,11 +5,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HexFormat;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -132,5 +134,23 @@ public class RedisTokenStore {
         Boolean exists = redisTemplate.hasKey("bl:at:" + accessJti);
 
         return (exists != null) && exists;
+    }
+
+    /*------------------------------------------------------------
+    임시코드 저장 ( 저장값으로 AccessToken 이용, 보안을 위해 1분간 유지)
+    oauth2:code:UUID AccessToken
+     ------------------------------------------------------------*/
+    public void saveTempCode(String code, String accessToken, long ttl) {
+        redisTemplate.opsForValue().set("oauth2:code:" + code, accessToken, Duration.ofSeconds(ttl));
+    }
+
+    /*------------------------------------------------------------
+    임시코드를 이용한 AccessToken 반환
+     ------------------------------------------------------------*/
+    public Optional<String> consumeCode(String code) {
+        String accessToken = redisTemplate.opsForValue().get("oauth2:code:" + code);
+        if(accessToken == null) return Optional.empty();
+        redisTemplate.delete("oauth2:code:" + code);
+        return Optional.of(accessToken);
     }
 }

@@ -21,9 +21,6 @@ spring:
         format_sql: true
         show_sql: true
 
-  # OAuth2 로그인 관련
-  # 구글은 별도의 인증요청, 토큰 요청, 사용자 조회 URL 을 등록할 필요가 없다.
-
 
 
 logging:

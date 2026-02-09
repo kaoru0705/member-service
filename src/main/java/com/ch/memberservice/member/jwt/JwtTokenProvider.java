@@ -58,7 +58,7 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
-                .subject(auth.getName())    // homepageId formlogin에 경우, .usernameParameter("homepageId")
+                .subject(auth.getName())    // homepageId auth 객체에서 getName()을 호출하면, 앞서 설정한 Principal의 값이 반환된다. 처음에 authenticationToken에 들어있는 인증 전 principal
                 .claim("roles", roles)    // 주장 아니라 여기선 사실
                 .claim("tokenType", "access")   // api 서버 접근용 토큰 (최대 생존 기간 15분으로 설정함)
                 .issuedAt(Date.from(now))   // 토큰 발급 시간

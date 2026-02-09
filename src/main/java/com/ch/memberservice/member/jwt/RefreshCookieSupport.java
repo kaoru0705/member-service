@@ -43,6 +43,8 @@ public class RefreshCookieSupport {
                 .build();
 
         // 헤더에 쿠키 추가
+        // Set-Cookie: 헤더의 이름 (통로)
+        // refreshToken: 쿠키의 이름 (Key)
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 

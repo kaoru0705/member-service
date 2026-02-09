@@ -23,7 +23,7 @@ public class RedisTokenStore {
     RefreshToken 자체에는 로그인을 했는지 안 했는지 판단해야 한다.
 
     회원 번호 23번에 jti를 비교해서 갖고 있다면 로그인한 것으로 판단
-    rt:current(현재 사용중인지 아닌지를 나타내는 키워드):{memberId} {jit} ex) rt:current:23 jti(UUID)
+    rt:current(현재 사용중인지 아닌지를 나타내는 키워드):{memberId} {jti} ex) rt:current:23 jti(UUID)
     로그인하면 멤버아이디를 통해 current key  값을 알 수 있고 그 value가 존재하지 않는다면 위에 rt:{memberId}:{jti} 이걸 제거
 
     refrehstoken 원문을 클라이언트에게 쿠키로 주지만 HttpOnly 옵션을 주니 JS에서 조작할 수 없다.

@@ -10,6 +10,14 @@ public class AccessTokenExtractor {
     private AccessTokenExtractor() {}
 
     public static Optional<String> extractBearerToken(HttpServletRequest request) {
+        // Header의 표준이름인 Authorization으로 헤더 얻기
+        /*
+            front단에서도 header이름을 Authorization으로 맞췄다.
+                 headers: {
+                "Authorization": "Bearer " + accessToken,
+                "Content-Type": "application/json"
+            }
+         */
         //String header = request.getHeader("Authorization");
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 

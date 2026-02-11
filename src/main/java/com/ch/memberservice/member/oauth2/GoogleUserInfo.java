@@ -4,6 +4,16 @@ package com.ch.memberservice.member.oauth2;
 import java.util.Map;
 
 /*
+ {
+     "sub": "109876543210123456789",
+     "email": "zino@gmail.com",
+     "email_verified": true,
+     "name": "지노",
+     "given_name": "지노",
+     "family_name": "",
+     "picture": "https://lh3.googleusercontent.com/a/...",
+     "locale": "ko"
+ }
     Google OAUth2 사용자 정보 정규화
     -   토큰 취득 후, 사용자 정보를 우리 애플리케이션에 provider가 전송할 때,  사용자 정보를
         OAuth2라는 객체로 감싸서 Service 객체로 전달된다.
